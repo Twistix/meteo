@@ -15,6 +15,25 @@ class AromeDownloader:
         self.api_key = user_settings["api_keys"].get("AROME")
         self.resolution = resolution
 
+    def _make_request(self, url, params=None, headers=None, timeout=5):
+        """
+        Retry an HTTP request until it succeeds or the user interrupts the program.
+        :param url: The URL to request.
+        :param params: Query parameters for the request (default: None).
+        :param headers: HTTP headers for the request (default: None).
+        :param timeout: Timeout for each request attempt in seconds (default: 10).
+        :return: The response object if successful.
+        """
+        while True:
+            try:
+                response = requests.get(url, params=params, headers=headers, timeout=timeout)
+                response.raise_for_status()
+                return response
+            except requests.exceptions.Timeout:
+                print(f"Request to {url} timed out.")
+            except requests.exceptions.RequestException as e:
+                print(f"Failed to download WCS file: {e}")
+
     def get_latest_run(self, data_type):
         """
         Fetch the most recent reference time for the specified data type.
@@ -39,13 +58,7 @@ class AromeDownloader:
         headers = {"apikey": str(self.api_key)} if self.api_key else {}
 
         # Step 2: Make the HTTP request
-        try:
-            response = requests.get(url, params=params, headers=headers, timeout=10)
-            response.raise_for_status()
-        except requests.exceptions.Timeout:
-            raise Exception(f"Request to {url} timed out.")
-        except requests.exceptions.RequestException as e:
-            raise Exception(f"Failed to download WCS file: {e}")
+        response = self._make_request(url, params=params, headers=headers)
 
         # Step 3: Parse XML content
         root = ET.fromstring(response.content)
@@ -89,13 +102,7 @@ class AromeDownloader:
         headers = {"apikey": str(self.api_key)} if self.api_key else {}
 
         # Step 2: Make the HTTP request
-        try:
-            response = requests.get(url, params=params, headers=headers, timeout=10)
-            response.raise_for_status()
-        except requests.exceptions.Timeout:
-            raise Exception(f"Request to {url} timed out.")
-        except requests.exceptions.RequestException as e:
-            raise Exception(f"Failed to fetch coverage description: {e}")
+        response = self._make_request(url, params=params, headers=headers)
 
         # Step 3: Parse the XML response
         root = ET.fromstring(response.content)
@@ -148,13 +155,7 @@ class AromeDownloader:
             headers = {"apikey": str(self.api_key)} if self.api_key else {}
 
             # Step 5: Make the HTTP request for the current subset time
-            try:
-                response = requests.get(url, params=params, headers=headers, timeout=10)
-                response.raise_for_status()  # Raise an exception for HTTP errors
-            except requests.exceptions.Timeout:
-                raise Exception(f"Request to {url} timed out.")
-            except requests.exceptions.RequestException as e:
-                raise Exception(f"Failed to download GRIB file for {subset_time}: {e}")
+            response = self._make_request(url, params=params, headers=headers)
 
             # Step 6: Save the file to the output directory
             output_path = os.path.join(output_dir, f"{data_type}_{reference_time}_{subset_time}.grib")
