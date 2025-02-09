@@ -1,12 +1,12 @@
 {
   "arome001": {
     "server": "https://public-api.meteofrance.fr/public/arome/1.0",
-    "capabilities_path": "/wcs/MF-NWP-HIGHRES-AROME-001-FRANCE-WCS/GetCapabilities",
-    "coverage_path": "/wcs/MF-NWP-HIGHRES-AROME-001-FRANCE-WCS/GetCoverage",
+    "get_capabilities_path": "/wcs/MF-NWP-HIGHRES-AROME-001-FRANCE-WCS/GetCapabilities",
+    "describe_coverage_path": "/wcs/MF-NWP-HIGHRES-AROME-001-FRANCE-WCS/DescribeCoverage",
+    "get_coverage_path": "/wcs/MF-NWP-HIGHRES-AROME-001-FRANCE-WCS/GetCoverage",
     "data_types": {
       "rain": {
-        "coverage_id": "TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE___{run_time}_PT1H",
-        "time_range": [1, 48]
+        "coverage_id": "TOTAL_PRECIPITATION__GROUND_OR_WATER_SURFACE___{run_time}_PT1H"
       }
     }
   }
